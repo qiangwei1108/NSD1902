@@ -1,0 +1,156 @@
+一 汇总数据
+
+Mysql高级查询-----汇总和分组数据，在工作中经常需要汇总数据而不是将他们全部检索出来(实际数据本身:返回实际数据是对时间和处理资源的浪费),这种类型的检索有如下特点:
+
+1:确定表中的行数(或满足某个条件或包含某个特定值的行数)
+
+2:获得表中行组的和
+
+3:找出表列(或所有行或某些特定的行)的最大值,最小值和平均值
+
+聚集函数:运行在行组上，计算和返回单个值的函数;
+
+SQL聚集函数如图：
+AVG（）返回平均值
+COUNT（）返回行数
+MAX（）最大值
+MIN（）最小值
+SUM（）返回某列值值和
+
+1,avg()函数通过对表中行数计数并计算特定列值之和，求得该列的平均值;avg()可用来返回所有平均值，也可以用来返回特定列的平均值;
+
+SELECT AVG(id) as age FROM person;
+
+avg()也可以用来确定特定列或行的平均值，如：
+
+SELECT AVG(id) as age FROM person WHERE age = 15;
+
+avg()只用来确定特定数值列的平均值，而且列名必须作为函数参数给出，为了获得多个列的平均值，必须使用多个avg()函数{avg()函数忽略列值为null的行};
+
+2，count()函数:确定表中行的数目或符合特定条件的行的数目.
+
+count()函数有两种使用方式:
+
+1:使用count(*)对表中行的数目进行计数，不管表列中包含的是空值(null)还是非空值；
+
+2:使用count(column)对特定列中具有值的行进行计数,忽略null值；
+
+SELECT count(*) as age FROM person;
+
+SELECT count(id) as age FROM person;
+
+如果指定列名，则指定列的值为空的行被count（）函数忽略，但如果count（）函数中用的是星号（*），则不忽略；
+
+3,max函数:返回指定列中的最大值，max（）要求指定列名
+
+SELECT max(id) as id FROM person;
+
+MySQL允许max（）用来返回任意列中的最大值，包括返回文本列的最大值；但用于文本数据时，如果数据按相应的列排序，则max（）返回最后一行（max（）函数忽略列值为null的行）
+
+4,min()函数:返回指定列的最小值，min（）也要求指定列名
+
+SELECT min(id) as id FROM person;
+
+MySQL允许min（）用来返回任意列中的最小值，包括返回文本列的最小值；但用于文本数据时，如果数据按相应的列排序，则min（）返回最前面的行（min（）函数忽略列值为null的行）.
+
+5,sum()函数:函数用来返回指定列值的和（总计）
+
+SELECT sum(age) as id FROM person WHERE age = 20;
+
+函数sum（）返回orderitems中所有quantity列的值之和，where子句保证只统计某个指定列的数值；
+
+利用标准的算数操作符，所有聚集函数都可用来执行多个列上的计算（sum（）函数忽略列值为null的行）
+
+6,distinct与聚集函数:
+
+Mysql5.0.3以及之后的版本，聚集函数和distinct可以搭配使用，比如:
+
+1:对所有的行执行计算，指定all参数或不给参数（all是默认所有行为，不需要指定，如果不指定distinct，则假定为all）；
+
+2:只包含不同的值，指定distinct参数；
+
+3:如果指定列名，则distinct只能用于count（）；distinct不能用于count（*），因此不允许使用count（distinct）；distinct必须使用列名，不能用于计算或者表达式；
+
+SELECT avg(distinct age) as id FROM person WHERE age = 20;
+
+这条SQL语句中，使用avg（）函数返回vend列中vend_id=1003的对应的price平均价格，因为使用了distinct参数，因此平均值只考虑不同的值（唯一值）
+
+7,组合聚集函数:
+
+select语句可以包含多个聚集函数，比如：
+
+SELECT count(*) as id,
+min(age) as age,
+max(age) as age,
+avg(age) as age
+FROM person;
+
+这条SQL语句，使用了单条select语句执行4个聚集计算，返回四个值（person表中id的数目、page的最高、最低以及平均值）
+
+PS：在指定别名以包含某个聚集函数的结果时，不应该使用表中实际的列名；这样便于使用SQL更加容易和理解，以及排除方便排除错误。
+
+二,分组数据
+
+1:group bu创建分组
+
+在MySQL中，分组是在select语句中的group by子句中建立的，比如：
+
+SELECT name,COUNT(*) as id FROM person GROUP BY name;
+
+group by子句指示指示MySQL分组数据，然后都每个组而不是整个结果集进行聚集；关于group by使用，请注意以下规则：
+
+1:group by子句可以包含任意数目的列（使得对分组进行嵌套，为数据分组提供更细致的控制）；
+
+2:如果在group by子句中嵌套分组，数据将在最后规定的分组上进行汇总，即：建立分组时，指定的所有列都一起计算（所以不能从个别列取回数据）；
+
+3:group by子句中列出的每个列都必须是检索列或有效的表达式（但不能是聚集函数），如果在select中使用表达式，则必须在group by子句中指定相同的表达式（不能使用别名）；
+
+4:除了聚集计算语句外，select中每个列都必须在group by子句中给出；
+
+5:如果分组列中具有null值，则null将作为一个分组返回（如果列中有多行null值，他们将分为一组）；
+
+6:group by子句必须出现在where子句之后，order by子句之前；
+
+2,HAVING过滤分组
+
+where子句都可以用having代替，区别在于where过滤行，having过滤分组；having支持所有的where操作符，比如：
+
+SELECT name,COUNT() as id FROM person GROUP BY name HAVING COUNT() >= 10;
+
+HAVING和WHERE的区别:
+
+where在数据分组前进行过滤，having在数据分组后进行过滤；where排除的行不包括在分组中（这可能会改变计算值，从而影响having子句中基于这些值过滤掉的分组）
+
+having和where可以同时使用，比如：
+
+SELECT name,COUNT() as id FROM person WHERE age >=20 GROUP BY name HAVING COUNT() >= 10;
+
+这条SQL语句中，where子句过滤掉所有prod_price至少为10的行，然后按照vend_id分组数据；having子句过滤技术为2或2以上的分组；
+
+3,分组和排序
+
+group by :
+
+1分组行，但输出可能不是分组的排
+2 只可能使用选择列或表达式列，而且必须使用每一列
+3与聚集函数一起使用列（或表达式）
+
+order by
+
+1:排序产生的输出
+
+2任意列都可以用(甚至非选择的列也可以使用)
+
+3不一定需要
+
+order by的重要性：一般使用group by子句时，应该也给出order by子句，这是保证数据正确性的唯一方法（千万不要依赖group by排序数据）。
+
+四：SELECT 子句顺序
+子句		说明			是否必须使用
+select	要返回的列或表达式	是否必须使用
+from		从中检索数据的表	仅在从表选择数据时使用
+where		行级过滤		否
+group by	分组说明		仅在按组计算聚集时使用
+having	组级过滤		否
+order by	输出排序顺序		否
+limit		要检索的行数		否

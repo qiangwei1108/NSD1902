@@ -1,0 +1,71 @@
+ MYSQL中，CAST函数的使用规则
+
+CAST函数语法规则是：Cast(字段名 as 转换的类型 )，其中类型可以为：
+
+CHAR[(N)] 字符型
+DATE 日期型
+DATETIME 日期和时间型
+DECIMAL float型
+SIGNED int
+TIME 时间型
+
+ 
+
+实例1：
+
+表table1
+
+date：2015-11-03 15:31:26
+
+select cast(date as signed) as date from  table1;
+
+结果如下：
+
+date：20151103153126
+
+select cast(date as char) as date from  table1;
+
+结果如下：
+
+date：2015-11-03 15:31:26
+
+ 实例2：
+
+select cast(date as datetime) as date from  table1;
+
+结果如下：
+
+date：2015-11-03 15:31:26
+
+ 实例3：
+
+select cast(date as date) as date from  table1;
+
+结果如下：
+
+date：2015-11-03
+
+ 实例4：
+
+select cast(date as time) as date from  table1;
+
+结果如下：
+
+date：15:31:26
+
+这里date对应日期，time对应时间
+
+实例5：
+
+表table2
+
+num:20
+
+select cast(num as decimal(10, 2)) as num from table2
+
+结果如下：
+
+num：20.00
+
+解释：decimal 数据类型最多可存储 38 个数字,所有数字都能够放到小数点的右边.decimal 数据类型存储了一个准确（精确）的数字表达法；不存储值的近似值.其中10是小数点左边和右边的数字个数之和(不包括小数点),2代表小数点右边的小数位数或数字个数.decimal(10,2)可以存储8位整数2位小数的数字.
+

@@ -1,0 +1,45 @@
+Incorrect parameter count in the call to native function 'ISNULL'
+
+1、错误描述
+
+    Caused by: com.mysql.jdbc.exceptions.jdbc4.MySQLSyntaxErrorException: Incorrect parameter count in the call to native function 'ISNULL'
+    	at sun.reflect.NativeConstructorAccessorImpl.newInstance0(Native Method)
+    	at sun.reflect.NativeConstructorAccessorImpl.newInstance(NativeConstructorAccessorImpl.java:57)
+    	at sun.reflect.DelegatingConstructorAccessorImpl.newInstance(DelegatingConstructorAccessorImpl.java:45)
+    	at java.lang.reflect.Constructor.newInstance(Constructor.java:526)
+    	at com.mysql.jdbc.Util.handleNewInstance(Util.java:411)
+    	at com.mysql.jdbc.Util.getInstance(Util.java:386)
+    	at com.mysql.jdbc.SQLError.createSQLException(SQLError.java:1053)
+    	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4074)
+    	at com.mysql.jdbc.MysqlIO.checkErrorPacket(MysqlIO.java:4006)
+    	at com.mysql.jdbc.MysqlIO.sendCommand(MysqlIO.java:2468)
+    	at com.mysql.jdbc.MysqlIO.sqlQueryDirect(MysqlIO.java:2629)
+    	at com.mysql.jdbc.ConnectionImpl.execSQL(ConnectionImpl.java:2713)
+    	at com.mysql.jdbc.StatementImpl.executeUpdate(StatementImpl.java:1794)
+    	at com.mysql.jdbc.StatementImpl.executeUpdate(StatementImpl.java:1712)
+    	at org.apache.commons.dbcp.DelegatingStatement.executeUpdate(DelegatingStatement.java:225)
+
+
+    1 queries executed, 0 success, 1 errors, 0 warnings
+     
+    查询：select count(isnull(depart_teacher,'')) from t_depart_info LIMIT 0, 1000
+     
+    错误代码： 1582
+    Incorrect parameter count in the call to native function 'isnull'
+     
+    执行耗时   : 0 sec
+    传送时间   : 0 sec
+    总耗时      : 0 sec
+
+
+2、错误原因
+
+     MySQL中的ISNULL和IFNULL有区别：
+
+     ISNULL只是用来判断是否为空，不能实现替换功能；而IFNULL不仅可以用来判断是否为空，还可以实现替换功能。
+
+
+3、解决办法
+
+     将ISNULL修改成IFNULL
+
